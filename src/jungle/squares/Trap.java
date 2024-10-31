@@ -1,8 +1,10 @@
-package jungle.Square;
+package jungle.squares;
+import jungle.Player;
 
-public class WaterSquare extends Square {
-    public WaterSquare() {
-        super(null);
+public class Trap extends Square {
+
+    public Trap(Player owner) {
+        super(owner);
     }
 
     @Override
@@ -12,11 +14,11 @@ public class WaterSquare extends Square {
 
     @Override
     public boolean isTrap() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isWater() {
-        return true;
+        return false;
     }
 }

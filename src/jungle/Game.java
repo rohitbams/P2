@@ -1,7 +1,11 @@
 package jungle;
-import jungle.Piece.Piece;
-import jungle.Square.Square;
+import jungle.pieces.Piece;
+import jungle.squares.Square;
 import java.util.List;
+import jungle.squares.Den;
+import jungle.squares.Trap;
+import jungle.squares.PlainSquare;
+import jungle.squares.WaterSquare;
 
 public class Game {
 
@@ -10,14 +14,15 @@ public class Game {
     public static int[] WATER_ROWS = {3, 4, 5};
     public static int[] WATER_COLS = {1, 2, 4, 5};
     public static int DEN_COL = 3;
-    public static Square[][] board;
+    private int row;
+    private int col;
+    // public static Square[][] board;
     public Player p0;
     public Player p1;
     // constructor
     public Game(Player p0, Player p1){
-        board = new Square[HEIGHT][WIDTH];
-        this.p0 = Player.p0;
-        this.p1 = Player.p1;
+//        this.p0 = Player.p0;
+//        this.p1 = Player.p1;
 
     }
 
@@ -37,14 +42,14 @@ public class Game {
     public Player getPlayer(int playerNumber) {
         // playerNumber == 0 return player p0
         // else
-        return Player.p1;
+        return playerNumber == 0 ? p0 : p1;
     }
 
     public Player getWinner(int playerNumber) {
         // if p0 enters p1's Den OR p1 owns 0 pieces
         // return p0
         // else
-        return Player.p1;
+        return playerNumber == 0 ? p0 : p1;
     }
 
     public boolean isGameOver() {
@@ -55,9 +60,9 @@ public class Game {
     }
 
     public Square getSquare(int row, int col) {
-        // int = board[][];
-        // col = board[][]
-        return board[HEIGHT][WIDTH];
+        this.row = row;
+        this.col = col;
+        return null;
     }
 
     List<Coordinate> getLegalMoves(int row, int col) {

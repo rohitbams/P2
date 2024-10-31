@@ -6,17 +6,15 @@ public class Player {
     private int playerNumber;
 
     private boolean hasCapturedDen;
+    private boolean losePiece;
+    private boolean gainPiece;
 
     // constructor
     public Player(String name, int playerNumber) {
         this.name = name;
         this.playerNumber = playerNumber;
         this.hasCapturedDen = false;
-
     }
-
-   // static Player p0 = new Player("Player 1", 0);
-   // static Player p1 = new Player("Player 2", 1);
 
     public String getName() {
         return name;
@@ -32,18 +30,19 @@ public class Player {
     }
 
     public boolean hasCapturedDen() {
-        return ! hasCapturedDen;
+        return hasCapturedDen;
     }
 
     public boolean hasPieces() {
-        // if Player has >0 pieces
-        // return true
         return false;
     }
 
     public void gainOnePiece() {
-
+        hasCapturedDen = false;
     }
 
-    public void lostOnePiece() {}
+    public void loseOnePiece() {
+        hasCapturedDen = true;
+        losePiece = true;
+    }
 }
