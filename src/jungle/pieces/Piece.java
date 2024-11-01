@@ -30,27 +30,28 @@ public class Piece {
     }
 
     public boolean canSwim() {
-        if (rank == 1) {
-            return true;
-        };
-        return false;
+        return rank == 1;
+//        if (rank == 1) {
+//            return true;
+//        };
+//        return false;
     }
 
     public boolean canLeapHorizontally() {
-        if (rank == 6) {return true;}
-        return false;
+        if (rank == 6) {
+            return true;
+        } return false;
     }
 
     public boolean canLeapVertically() {
-        if (rank == 7) {return true;}
-        return false;
+        if (rank == 7) {
+            return true;
+        } return false;
     }
 
     public void move(Square toSquare) {
-        if (toSquare.isDen()) {
-            if (!isOwnedBy(owner)) {
-                owner.captureDen();
-            }
+        if (toSquare.isDen() && !toSquare.isOwnedBy(owner)) {
+            owner.captureDen();
         } else if (toSquare.isTrap()) {
             getStrength();
         }
@@ -58,20 +59,19 @@ public class Piece {
 
     public boolean canDefeat(Piece target) {
         if (rank == 1 && target.rank == 8) {
-            return true; // rat can defeat elephant
+            return true; // rat defeats elephant
         } else if (target.rank <= rank) {
-            return true; // pieces with strength higher or equal to opposite pieces can defeat them
+            return true; // strength >= defeat lower
         } else if (target.square.isTrap()) {
             return true; // pieces of lower strength can defeat trapped pieces of higher strength
-        }
-        return false;
+        } return false;
     }
 
     public void beCaptured() {
-        owner.loseOnePiece();
+
+
+        if (owner.hasPieces()) {
+            owner.loseOnePiece();
+        }
     }
-
-
-
-
 }

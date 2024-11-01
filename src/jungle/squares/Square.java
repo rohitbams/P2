@@ -12,8 +12,7 @@ public abstract class Square {
     public boolean isOwnedBy(Player player) {
         if (this.owner == null) {
             return false;
-        }
-        return this.owner.equals(player);
+        } return this.owner.equals(player);
     }
 
     public abstract boolean isWater();

@@ -6,8 +6,9 @@ public class Player {
     private int playerNumber;
 
     private boolean hasCapturedDen;
-    private boolean losePiece;
-    private boolean gainPiece;
+    // private int pieces = 8;
+    // private boolean losePiece;
+    // private boolean gainPiece;
 
     // constructor
     public Player(String name, int playerNumber) {
@@ -33,15 +34,17 @@ public class Player {
     }
 
     public boolean hasPieces() {
-        return true;
+        // if owner has pieces return true
+
+        // if !owner has pieces return false
+        return false;
     }
 
     public void gainOnePiece() {
-        hasCapturedDen = false;
+        hasPieces();
     }
 
     public void loseOnePiece() {
-        hasCapturedDen = true;
-        losePiece = true;
+       hasPieces();
     }
 }
