@@ -26,7 +26,6 @@ public class Player {
 
     public void captureDen() {
         hasCapturedDen = true;
-        // Player enters opposite Player's Den
     }
 
     public boolean hasCapturedDen() {
@@ -34,7 +33,7 @@ public class Player {
     }
 
     public boolean hasPieces() {
-        return false;
+        return true;
     }
 
     public void gainOnePiece() {

@@ -3,6 +3,7 @@ import jungle.Player;
 
 public class Trap extends Square {
 
+    // constructor
     public Trap(Player owner) {
         super(owner);
     }

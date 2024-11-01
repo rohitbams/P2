@@ -5,6 +5,6 @@ import jungle.squares.Square;
 public class Rat extends Piece {
 
     public Rat(Player owner, Square square) {
-        super(owner, square, 6);
+        super(owner, square, 1);
     }
 }
