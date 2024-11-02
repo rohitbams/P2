@@ -31,10 +31,6 @@ public class Piece {
 
     public boolean canSwim() {
         return rank == 1;
-//        if (rank == 1) {
-//            return true;
-//        };
-//        return false;
     }
 
     public boolean canLeapHorizontally() {
@@ -68,10 +64,6 @@ public class Piece {
     }
 
     public void beCaptured() {
-
-
-        if (owner.hasPieces()) {
-            owner.loseOnePiece();
-        }
+        owner.loseOnePiece();
     }
 }

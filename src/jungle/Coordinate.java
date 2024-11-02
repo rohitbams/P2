@@ -15,7 +15,7 @@ public class Coordinate {
     }
 
     public int col() {
-        // if coll is less than 8 && more than 0
+        // if col is less than 8 && more than 0
         return col;
     }
 }

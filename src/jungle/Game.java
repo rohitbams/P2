@@ -1,9 +1,14 @@
 package jungle;
 import jungle.Player;
 import jungle.Game;
+import jungle.pieces.Lion;
 import jungle.pieces.Piece;
+import jungle.pieces.Rat;
+import jungle.pieces.Tiger;
 import jungle.squares.Square;
 import jungle.IllegalMoveException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
@@ -15,9 +20,14 @@ public class Game {
     public static int DEN_COL = 3;
     private int row;
     private int col;
-    public Player p0;
-    public Player p1;
-
+    private Player p0;
+    private Player p1;
+    private Player owner;
+    private Square square;
+    private Piece piece;
+    private Piece movingPiece;
+    private Square destinationSquare;
+    private Piece targetPiece;
     // constructor
     public Game(Player p0, Player p1) {
         this.p0 = p0;
@@ -29,11 +39,11 @@ public class Game {
         addPiece(0, 0, 7, 0); // P0 Lion
         addPiece(0, 6, 6, 0); // P0 Tiger
         addPiece(1, 1, 3, 0); // P0 Dog
-        addPiece(1, 1, 2, 0); // P0 Cat
+        addPiece(1, 5, 2, 0); // P0 Cat
         addPiece(2, 0, 1, 0); // P0 Rat
         addPiece(2, 2, 5, 0); // P0 Leopard
         addPiece(2, 4, 4, 0); // P0 Wolf
-        addPiece(2, 8, 8, 0); // P0 Elephant
+        addPiece(2, 6, 8, 0); // P0 Elephant
 
         // add P1 starting pieces
         addPiece(8, 6, 7, 1); // P1 Lion
@@ -47,28 +57,76 @@ public class Game {
     }
 
     public void addPiece(int row, int col, int rank, int playerNumber) {
+        owner = getPlayer(playerNumber);
+        square = getSquare(row, col);
+        if (rank == 7) {
+            piece = new Lion(owner, square);
+        } else if (rank == 6) {
+            piece = new Tiger(owner, square);
+        } else if (rank == 1) {
+            piece = new Rat(owner, square);
+        } else {
+            piece = new Piece(owner, square, rank);
+        }
+        owner.gainOnePiece();
     }
 
     public Piece getPiece(int row, int col) {
-        this.row = row;
-        this.col = col;
-        return null;
+        return piece;
     }
 
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
+        if (fromRow < 0 || fromRow > WIDTH || toRow < 0 || toRow > WIDTH ||
+                fromCol < 0 || fromCol > HEIGHT || toCol < 0 || toCol > HEIGHT) {
+            throw new IllegalMoveException("Invalid move");
+        }
+        movingPiece = getPiece(fromRow, fromCol);
+        if (movingPiece == null) {
+            throw new IllegalMoveException("Invalid move");
+        }
+        destinationSquare = getSquare(toRow, toCol);
+        
+        targetPiece = getPiece(toRow, toCol);
+        
+        if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
+            throw new IllegalMoveException("Invalid move");
+        }
 
+        if (targetPiece == null) {
+            if (!movingPiece.canDefeat(targetPiece)) {
+                throw new IllegalMoveException("Cannot capture target piece");
+            }
+
+            movingPiece.move(destinationSquare);
+        }
+
+    }
+
+    private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
+        Piece piece = getPiece(fromRow, fromCol);
+        boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
+
+        if (piece.canLeapHorizontally() && fromRow == toRow) {
+            return false;
+        }
+        if (piece.canLeapVertically() && fromRow == toRow) {
+            return false;
+        }
+        if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
+            return false;
+        }
+        if (getSquare(toRow, toCol).isWater() && !piece.canSwim()) {
+            return false;
+        }
+        return true;
     }
 
     public Player getPlayer(int playerNumber) {
         return playerNumber == 0 ? p0 : p1;
     }
 
-    public Player getWinner(int playerNumber) {
-        // if p0 enters p1's Den OR p1 owns 0 pieces
-        // return p0
-        // else
-        // return playerNumber == 0 ? p0 : p1;
-        if (p0.hasCapturedDen() || !p1.hasPieces()) {
+    public Player getWinner() {
+        if (p0.hasCapturedDen() || p1.hasPieces()) {
             return p0;
         } else if (p1.hasCapturedDen() || !p0.hasPieces()) {
             return p1;
@@ -77,10 +135,10 @@ public class Game {
     }
 
     public boolean isGameOver() {
-        // if p0 OR p1 owns 0 pieces OR p0 OR p1 enters a Den square
-        // return true
-        // else
-        return false;
+        if (getWinner() == null) {
+            return false;
+        }
+        return true;
     }
 
     public Square getSquare(int row, int col) {
@@ -90,11 +148,8 @@ public class Game {
     }
 
     public List<Coordinate> getLegalMoves(int row, int col) {
-        // if (row <= 6 && row >= 0 && col <= 8 && col >= 0) {
+        List<Coordinate> legalMoves = new ArrayList<>();
 
-        // if rank == 0 row + 1, row - 1 col + 1. col -1; isWater
-        // if rank == 7 leapVertically
-        // if rank == 6 leapHorizontally
             return List.of();
         }
 }
