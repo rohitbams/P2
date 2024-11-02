@@ -1,7 +1,9 @@
-package jungle.Square;
+package jungle.squares;
 
-public class WaterSquare extends Square {
-    public WaterSquare() {
+public class PlainSquare extends Square {
+
+    // constructor
+    public PlainSquare() {
         super(null);
     }
 
@@ -17,6 +19,6 @@ public class WaterSquare extends Square {
 
     @Override
     public boolean isWater() {
-        return true;
+        return false;
     }
 }

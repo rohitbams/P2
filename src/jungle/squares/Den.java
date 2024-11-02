@@ -1,15 +1,16 @@
-package jungle.Square;
+package jungle.squares;
+import jungle.Player;
 
-public class PlainSquare extends Square {
+public class Den extends Square {
 
     // constructor
-    public PlainSquare() {
-        super(null);
+    public Den(Player owner) {
+        super(owner);
     }
 
     @Override
     public boolean isDen() {
-        return false;
+        return true;
     }
 
     @Override

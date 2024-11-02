@@ -1,18 +1,18 @@
-package jungle.Square;
+package jungle.squares;
 import jungle.Player;
-
 
 public abstract class Square {
 
-    public Player owner;
+    private final Player owner;
 
     public Square(Player owner) {
         this.owner = owner;
     }
 
     public boolean isOwnedBy(Player player) {
-        // if den or trap return true
-        // if plain oor water square return false
+        if (this.owner == null) {
+            return false;
+        } return this.owner.equals(player);
     }
 
     public abstract boolean isWater();

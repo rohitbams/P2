@@ -2,21 +2,19 @@ package jungle;
 
 public class Player {
 
-    private String name;
-    private int playerNumber;
+    private final String name;
+    private final int playerNumber;
 
     private boolean hasCapturedDen;
+    private int pieceCount;
 
     // constructor
     public Player(String name, int playerNumber) {
         this.name = name;
         this.playerNumber = playerNumber;
         this.hasCapturedDen = false;
-
+        this.pieceCount = 0;
     }
-
-   // static Player p0 = new Player("Player 1", 0);
-   // static Player p1 = new Player("Player 2", 1);
 
     public String getName() {
         return name;
@@ -28,22 +26,24 @@ public class Player {
 
     public void captureDen() {
         hasCapturedDen = true;
-        // Player enters opposite Player's Den
     }
 
     public boolean hasCapturedDen() {
-        return ! hasCapturedDen;
+        return hasCapturedDen;
     }
 
     public boolean hasPieces() {
-        // if Player has >0 pieces
-        // return true
-        return false;
+        if (pieceCount > 0) return true;
+        else return false;
     }
 
     public void gainOnePiece() {
-
+        pieceCount++;
     }
 
-    public void lostOnePiece() {}
+    public void loseOnePiece() {
+        if (pieceCount > 0) {
+            pieceCount--;
+        }
+    }
 }

@@ -1,16 +1,13 @@
-package jungle.Square;
-import jungle.Player;
+package jungle.squares;
 
-public class Den extends Square {
-
-    // constructor
-    public Den(Player owner) {
+public class WaterSquare extends Square {
+    public WaterSquare() {
         super(null);
     }
 
     @Override
     public boolean isDen() {
-        return true;
+        return false;
     }
 
     @Override
@@ -20,6 +17,6 @@ public class Den extends Square {
 
     @Override
     public boolean isWater() {
-        return false;
+        return true;
     }
 }
