@@ -20,6 +20,8 @@ public class Game {
 
     // constructor
     public Game(Player p0, Player p1) {
+        this.p0 = p0;
+        this.p1 = p1;
     }
 
     public void addStartingPieces() {
@@ -88,10 +90,11 @@ public class Game {
     }
 
     public List<Coordinate> getLegalMoves(int row, int col) {
-        getSquare(0,0);
+        // if (row <= 6 && row >= 0 && col <= 8 && col >= 0) {
 
-
-        return List.of();
-    }
-
+        // if rank == 0 row + 1, row - 1 col + 1. col -1; isWater
+        // if rank == 7 leapVertically
+        // if rank == 6 leapHorizontally
+            return List.of();
+        }
 }

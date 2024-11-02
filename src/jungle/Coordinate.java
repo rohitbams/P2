@@ -10,10 +10,12 @@ public class Coordinate {
     }
 
     public int row() {
+        // if row is less than 6 && more than 0
         return row;
     }
 
     public int col() {
+        // if coll is less than 8 && more than 0
         return col;
     }
 }
