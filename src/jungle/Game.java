@@ -92,7 +92,8 @@ public class Game {
     }
 
     public Piece getPiece(int row, int col) {
-        return board[row][col].;
+        return piece;
+        // return board[row][col];
     }
 
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
