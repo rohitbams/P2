@@ -1,12 +1,9 @@
 package jungle;
-import jungle.Player;
-import jungle.Game;
 import jungle.pieces.Lion;
 import jungle.pieces.Piece;
 import jungle.pieces.Rat;
 import jungle.pieces.Tiger;
 import jungle.squares.Square;
-import jungle.IllegalMoveException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +15,13 @@ public class Game {
     public static int[] WATER_ROWS = {3, 4, 5};
     public static int[] WATER_COLS = {1, 2, 4, 5};
     public static int DEN_COL = 3;
-    private int row;
-    private int col;
     private Player p0;
     private Player p1;
     private Player owner;
     private Square square;
     private Piece piece;
     private Piece movingPiece;
-    private Square destinationSquare;
+    private Square toSquare;
     private Piece targetPiece;
     // constructor
     public Game(Player p0, Player p1) {
@@ -57,8 +52,8 @@ public class Game {
     }
 
     public void addPiece(int row, int col, int rank, int playerNumber) {
-        owner = getPlayer(playerNumber);
-        square = getSquare(row, col);
+        owner = getPlayer(playerNumber); // points to Player
+        square = getSquare(row, col); // gets square
         if (rank == 7) {
             piece = new Lion(owner, square);
         } else if (rank == 6) {
@@ -84,27 +79,23 @@ public class Game {
         if (movingPiece == null) {
             throw new IllegalMoveException("Invalid move");
         }
-        destinationSquare = getSquare(toRow, toCol);
-        
+        toSquare = getSquare(toRow, toCol);
         targetPiece = getPiece(toRow, toCol);
-        
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
-
         if (targetPiece == null) {
             if (!movingPiece.canDefeat(targetPiece)) {
-                throw new IllegalMoveException("Cannot capture target piece");
+                throw new IllegalMoveException("Cannot capture that piece");
             }
-
-            movingPiece.move(destinationSquare);
+            movingPiece.move(toSquare);
         }
-
     }
 
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
-        Piece piece = getPiece(fromRow, fromCol);
+        piece = getPiece(fromRow, fromCol);
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
+        toSquare = getSquare(toRow, toCol);
 
         if (piece.canLeapHorizontally() && fromRow == toRow) {
             return false;
@@ -115,14 +106,14 @@ public class Game {
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
         }
-        if (getSquare(toRow, toCol).isWater() && !piece.canSwim()) {
+        if (toSquare.isWater() && !piece.canSwim()) {
             return false;
         }
         return true;
     }
 
     public Player getPlayer(int playerNumber) {
-        return playerNumber == 0 ? p0 : p1;
+        return playerNumber == 0 ? p0 : p1; // if playerNumber is 0, return p0, else return p1
     }
 
     public Player getWinner() {
@@ -130,26 +121,29 @@ public class Game {
             return p0;
         } else if (p1.hasCapturedDen() || !p0.hasPieces()) {
             return p1;
-        }
-        return null;
+        } return null;
     }
 
     public boolean isGameOver() {
         if (getWinner() == null) {
             return false;
-        }
-        return true;
+        } return true;
     }
 
     public Square getSquare(int row, int col) {
-//        this.row = row;
-//        this.col = col;
-        return null;
+
+        return ;
     }
 
     public List<Coordinate> getLegalMoves(int row, int col) {
         List<Coordinate> legalMoves = new ArrayList<>();
 
-            return List.of();
+        for (int newRow = 0; newRow < HEIGHT; newRow++) {
+            for (int newCol = 0; newCol < WIDTH; newCol++) {
+                if (isValidMove(newRow, newCol, row, col)) {
+                    legalMoves.add(new Coordinate(newRow, newCol));
+                }
+            }
+        } return legalMoves;
         }
 }
