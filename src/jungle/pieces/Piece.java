@@ -46,9 +46,9 @@ public class Piece {
     public void move(Square toSquare) {
         if (toSquare.isDen() && !toSquare.isOwnedBy(owner)) {
             owner.captureDen();
-        } else if (toSquare.isTrap()) {
+        } else if (toSquare.isTrap() && !toSquare.isOwnedBy(owner)) {
             getStrength();
-        }
+        } // (toSquare.isWater()) {}
     }
 
     public boolean canDefeat(Piece target) {

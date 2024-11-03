@@ -5,6 +5,8 @@ import jungle.pieces.Rat;
 import jungle.pieces.Tiger;
 import jungle.squares.*;
 
+import java.security.cert.CertPath;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class Game {
     public static int[] WATER_COLS = {1, 2, 4, 5};
     public static int DEN_COL = 3;
     public Square[][] board;
+    private HashMap<Coordinate, Piece> piecesHashMap;
     private Player p0;
     private Player p1;
     private Player owner;
@@ -27,6 +30,7 @@ public class Game {
         this.p0 = p0;
         this.p1 = p1;
         this.board = new Square[HEIGHT][WIDTH];
+        this.piecesHashMap = new HashMap<>();
         initialiseBoard();
     }
 
@@ -54,6 +58,11 @@ public class Game {
 
     }
 
+    // helper method for creating coordinates
+    private Coordinate createCoordinate(int row, int col) {
+        return new Coordinate(row, col);
+    }
+
     public void addStartingPieces() {
         // add P0 starting pieces
         addPiece(0, 0, 7, 0); // P0 Lion
@@ -77,41 +86,46 @@ public class Game {
     }
 
     public void addPiece(int row, int col, int rank, int playerNumber) {
-        owner = getPlayer(playerNumber); // points to Player
-        square = getSquare(row, col); // gets square
+        owner = getPlayer(playerNumber); // stores Player
+        square = getSquare(row, col); // stores square
         if (rank == 7) {
-            piece = new Lion(owner, square);
-        } else if (rank == 6) {
-            piece = new Tiger(owner, square);
-        } else if (rank == 1) {
-            piece = new Rat(owner, square);
-        } else {
-            piece = new Piece(owner, square, rank);
+            this.piece = new Lion(owner, square);
         }
+        if (rank == 6) {
+            this.piece = new Tiger(owner, square);
+        }
+        if (rank == 1) {
+            this.piece = new Rat(owner, square);
+        }
+        else {
+            this.piece = new Piece(owner, square, rank);
+        }
+        piecesHashMap.put(createCoordinate(row, col), this.piece);
         owner.gainOnePiece();
     }
 
     public Piece getPiece(int row, int col) {
-        return piece;
-        // return board[row][col];
+        return piecesHashMap.get(createCoordinate(row, col));
     }
 
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
         if (fromRow < 0 || fromRow > WIDTH || toRow < 0 || toRow > WIDTH ||
                 fromCol < 0 || fromCol > HEIGHT || toCol < 0 || toCol > HEIGHT) {
-            throw new IllegalMoveException("Invalid move");
+            throw new IndexOutOfBoundsException("Invalid move");
         }
         Piece movingPiece = getPiece(fromRow, fromCol);
         if (movingPiece == null) {
-            throw new IllegalMoveException("Invalid move");
+            throw new NullPointerException("No such piece");
         }
         Square toSquare = getSquare(toRow, toCol);
         Piece targetPiece = getPiece(toRow, toCol);
+
+
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
         if (targetPiece == null) {
-            if (!movingPiece.canDefeat(targetPiece)) {
+            if (!movingPiece.canDefeat(null)) {
                 throw new IllegalMoveException("Cannot capture that piece");
             }
             movingPiece.move(toSquare);
@@ -120,6 +134,11 @@ public class Game {
 
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
         piece = getPiece(fromRow, fromCol);
+
+        if (piece == null) {
+            return false;
+        }
+
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
         Square toSquare = getSquare(toRow, toCol);
 
@@ -132,13 +151,16 @@ public class Game {
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
         }
-        if (toSquare.isWater() && !piece.canSwim()) {
+        if (toSquare.isWater() && !piece.canSwim()) { // if any piece other than Rat tries to enter water
             return false;
         }
         return true;
     }
 
     public Player getPlayer(int playerNumber) {
+        if (playerNumber > 1 || playerNumber < 0) {
+            throw new IllegalArgumentException("Invalid player");
+        }
         return playerNumber == 0 ? p0 : p1; // if playerNumber is 0, return p0, else return p1
     }
 
@@ -173,4 +195,12 @@ public class Game {
             }
         } return legalMoves;
         }
+
+    public HashMap<Coordinate, Piece> getPiecesHashMap() {
+        return piecesHashMap;
+    }
+
+    public void setPiecesHashMap(HashMap<Coordinate, Piece> piecesHashMap) {
+        this.piecesHashMap = piecesHashMap;
+    }
 }
