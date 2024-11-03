@@ -4,8 +4,7 @@ import jungle.pieces.Piece;
 import jungle.pieces.Rat;
 import jungle.pieces.Tiger;
 import jungle.squares.*;
-
-import java.security.cert.CertPath;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,14 +89,11 @@ public class Game {
         square = getSquare(row, col); // stores square
         if (rank == 7) {
             this.piece = new Lion(owner, square);
-        }
-        if (rank == 6) {
+        } else if (rank == 6) {
             this.piece = new Tiger(owner, square);
-        }
-        if (rank == 1) {
+        } else if (rank == 1) {
             this.piece = new Rat(owner, square);
-        }
-        else {
+        } else {
             this.piece = new Piece(owner, square, rank);
         }
         piecesHashMap.put(createCoordinate(row, col), this.piece);
@@ -203,4 +199,36 @@ public class Game {
     public void setPiecesHashMap(HashMap<Coordinate, Piece> piecesHashMap) {
         this.piecesHashMap = piecesHashMap;
     }
+
+    public static void main(String[] args) {
+        Player p0 = new Player("Player 1", 0);
+        Player p1 = new Player("Player 2", 1);
+
+        Game game = new Game(p0, p1);
+
+        System.out.println("Adding piece");
+        game.addPiece(2, 4, 4, 0);
+
+        System.out.println("HashMap Size: " + game.getPiecesHashMap().size());
+
+        for (Coordinate coord: game.getPiecesHashMap().keySet()) {
+            System.out.println("row: " + coord.row() + " col: " + coord.col());
+        }
+        Piece piece = game.getPiece(2, 4);
+
+            System.out.println("\n" + piece != null ? "found" : "Null piece");
+
+        // assert piece != null;
+        // System.out.println(piece + "strength: " + piece.getStrength());
+
+        System.out.println("\n All pieces in HashMap");
+        for (Map.Entry<Coordinate, Piece> entry : game.getPiecesHashMap().entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+
+    }
+
 }
+
+
