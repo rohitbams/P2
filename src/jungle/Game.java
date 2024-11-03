@@ -3,7 +3,7 @@ import jungle.pieces.Lion;
 import jungle.pieces.Piece;
 import jungle.pieces.Rat;
 import jungle.pieces.Tiger;
-import jungle.squares.Square;
+import jungle.squares.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +15,43 @@ public class Game {
     public static int[] WATER_ROWS = {3, 4, 5};
     public static int[] WATER_COLS = {1, 2, 4, 5};
     public static int DEN_COL = 3;
+    public Square[][] board;
     private Player p0;
     private Player p1;
     private Player owner;
     private Square square;
     private Piece piece;
-    private Piece movingPiece;
-    private Square toSquare;
-    private Piece targetPiece;
+
     // constructor
     public Game(Player p0, Player p1) {
         this.p0 = p0;
         this.p1 = p1;
+        this.board = new Square[HEIGHT][WIDTH];
+        initialiseBoard();
+    }
+
+    public void initialiseBoard() {
+        for (int row = 0; row < HEIGHT; row++) {
+            for (int col = 0; col < WIDTH; col++) {
+                board[row][col] = new PlainSquare();
+            }
+        }
+        for (int row : WATER_ROWS) {
+            for (int col : WATER_COLS) {
+                board[row][col] = new WaterSquare();
+            }
+        }
+        board[0][DEN_COL] = new Den(p0);
+        board[HEIGHT - 1][DEN_COL] = new Den(p1);
+
+        board[0][DEN_COL -1] = new Trap(p0);
+        board[0][DEN_COL + 1] = new Trap(p0);
+        board[1][DEN_COL] = new Trap(p0);
+
+        board[HEIGHT - 1][DEN_COL -1] = new Trap(p1);
+        board[HEIGHT - 1][DEN_COL + 1] = new Trap(p1);
+        board[HEIGHT - 2][DEN_COL] = new Trap(p1);
+
     }
 
     public void addStartingPieces() {
@@ -75,12 +100,12 @@ public class Game {
                 fromCol < 0 || fromCol > HEIGHT || toCol < 0 || toCol > HEIGHT) {
             throw new IllegalMoveException("Invalid move");
         }
-        movingPiece = getPiece(fromRow, fromCol);
+        Piece movingPiece = getPiece(fromRow, fromCol);
         if (movingPiece == null) {
             throw new IllegalMoveException("Invalid move");
         }
-        toSquare = getSquare(toRow, toCol);
-        targetPiece = getPiece(toRow, toCol);
+        Square toSquare = getSquare(toRow, toCol);
+        Piece targetPiece = getPiece(toRow, toCol);
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
@@ -95,7 +120,7 @@ public class Game {
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
         piece = getPiece(fromRow, fromCol);
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
-        toSquare = getSquare(toRow, toCol);
+        Square toSquare = getSquare(toRow, toCol);
 
         if (piece.canLeapHorizontally() && fromRow == toRow) {
             return false;
@@ -117,7 +142,7 @@ public class Game {
     }
 
     public Player getWinner() {
-        if (p0.hasCapturedDen() || p1.hasPieces()) {
+        if (p0.hasCapturedDen() || !p1.hasPieces()) {
             return p0;
         } else if (p1.hasCapturedDen() || !p0.hasPieces()) {
             return p1;
@@ -131,8 +156,9 @@ public class Game {
     }
 
     public Square getSquare(int row, int col) {
-
-        return ;
+        if (row < 0 || row >= HEIGHT || col < 0 || col >= WIDTH) {
+            throw new IndexOutOfBoundsException();
+        } return board[row][col];
     }
 
     public List<Coordinate> getLegalMoves(int row, int col) {
