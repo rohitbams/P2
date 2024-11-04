@@ -121,18 +121,19 @@ public class Game {
     }
 
     public void addPiece(int row, int col, int rank, int playerNumber) {
-        owner = getPlayer(playerNumber); // stores Player
-        square = getSquare(row, col); // stores square
+        Player owner = getPlayer(playerNumber); // stores Player
+        Square square = getSquare(row, col); // stores square
+        Piece piece;
         if (rank == 7) {
-            this.piece = new Lion(owner, square);
+            piece = new Lion(owner, square);
         } else if (rank == 6) {
-            this.piece = new Tiger(owner, square);
+            piece = new Tiger(owner, square);
         } else if (rank == 1) {
-            this.piece = new Rat(owner, square);
+            piece = new Rat(owner, square);
         } else {
-            this.piece = new Piece(owner, square, rank);
+            piece = new Piece(owner, square, rank);
         }
-        piecesHashMap.put(createCoordinate(row, col), this.piece);
+        piecesHashMap.put(createCoordinate(row, col), piece);
     }
 
     public Piece getPiece(int row, int col) {
