@@ -252,7 +252,7 @@ public class Game {
 
         for (int newRow = 0; newRow < HEIGHT; newRow++) {
             for (int newCol = 0; newCol < WIDTH; newCol++) {
-                if (isValidMove(newRow, newCol, row, col)) {
+                if (isValidMove(row, newRow, col,newCol)) {
                     legalMoves.add(new Coordinate(newRow, newCol));
                 }
             }
