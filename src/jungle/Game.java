@@ -157,25 +157,15 @@ public class Game {
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
-        if (targetPiece == null) {
-            if (!movingPiece.canDefeat(null)) {
-                throw new IllegalMoveException("Cannot capture that piece");
-            }
-            // Add movingPiece new square coordinates
-            piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
-            // Remove movingPiece old square coordinates
-            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
-            movingPiece.move(toSquare);
-        }
-        if (movingPiece.canDefeat(targetPiece)) {
-            // Add movingPiece new square coordinates
-            piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
-            // Remove movingPiece old square coordinates
-            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
-            movingPiece.move(toSquare);
-        }
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
-            throw new IllegalMoveException("Cannot capture that piece");
+                throw new IllegalMoveException("Cannot capture that piece");
+        }
+        if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
+            // Add movingPiece new square coordinates
+            piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
+            // Remove movingPiece old square coordinates
+            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
+            movingPiece.move(toSquare);
         }
     }
 
