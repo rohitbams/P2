@@ -3,16 +3,23 @@ import jungle.Player;
 import jungle.squares.Trap;
 import jungle.squares.Square;
 
+/** Piece class.
+ *  This class contains attributes and behaviours
+ *  of the various types of pieces in the game.
+ *  The classes Rat, Tiger, and Lion extend this class.
+ */
 public class Piece {
 
     private Player owner;
     private Square square;
     private int rank;
 
+    // Piece Constructor
     public Piece(Player owner, Square square, int rank) {
         this.owner = owner;
         this.square = square;
         this.rank = rank;
+        owner.gainOnePiece();
     }
 
     public boolean isOwnedBy(Player player) {
@@ -48,7 +55,7 @@ public class Piece {
             owner.captureDen();
         } else if (toSquare.isTrap() && !toSquare.isOwnedBy(owner)) {
             getStrength();
-        } // (toSquare.isWater()) {}
+        }
     }
 
     public boolean canDefeat(Piece target) {
@@ -57,11 +64,12 @@ public class Piece {
         } else if (target.rank <= rank) {
             return true; // strength >= defeat lower
         } else if (target.square.isTrap()) {
-            return true; // pieces of lower strength can defeat trapped pieces of higher strength
+            // lower strength pieces can defeat trapped higher strength pieces
+            return true;
         } return false;
     }
 
     public void beCaptured() {
-        owner.hasPieces();
+        owner.loseOnePiece();
     }
 }

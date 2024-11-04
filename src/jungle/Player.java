@@ -1,5 +1,11 @@
 package jungle;
 
+/**
+ * Player class.
+ * This class creates Player objects
+ * and contains attributes and behaviours
+ * for Player objects.
+ */
 public class Player {
 
     private final String name;
@@ -36,11 +42,6 @@ public class Player {
         return pieceCount;
     }
 
-    public boolean hasPieces() {
-        if (pieceCount > 0) return true;
-        else return false;
-    }
-
     public void gainOnePiece() {
         pieceCount++;
     }
@@ -49,5 +50,8 @@ public class Player {
         if (pieceCount > 0) {
             pieceCount--;
         }
+    }
+    public boolean hasPieces() {
+        return pieceCount > 0;
     }
 }

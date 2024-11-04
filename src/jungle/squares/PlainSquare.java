@@ -1,5 +1,9 @@
 package jungle.squares;
 
+/**
+ * PlainSquare class.
+ * This is a subclass of the Square class
+ */
 public class PlainSquare extends Square {
 
     // constructor

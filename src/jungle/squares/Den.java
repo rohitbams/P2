@@ -1,6 +1,10 @@
 package jungle.squares;
 import jungle.Player;
 
+/**
+ * Den class.
+ * This is a subclass of the Square class
+ */
 public class Den extends Square {
 
     // constructor
