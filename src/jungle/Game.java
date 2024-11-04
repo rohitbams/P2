@@ -184,7 +184,7 @@ public class Game {
             int minCol = Math.min(fromCol, toCol);
             int maxCol = Math.max(fromCol, toCol);
 
-            for (int col = minCol + 1; col <= maxCol; col++) {
+            for (int col = minCol + 1; col < maxCol; col++) {
                 Square square = getSquare(fromRow, col);
                 if (!square.isWater()) {
                     return false;
@@ -200,12 +200,12 @@ public class Game {
             int minRow = Math.min(fromRow, toRow);
             int maxRow = Math.max(fromRow, toRow);
 
-            for (int row = minRow + 1; row <= maxRow; row++) {
+            for (int row = minRow + 1; row < maxRow; row++) {
                 Square square = getSquare(row, fromCol);
                 if (!square.isWater()) {
                     return false;
                 }
-                Piece ratInWater = getPiece(fromRow, row);
+                Piece ratInWater = getPiece(row, fromCol);
                 if (ratInWater != null && ratInWater.canSwim()) {
                     return false;
                 }
