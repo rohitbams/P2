@@ -182,7 +182,7 @@ public class Game {
         if (piece.canLeapHorizontally() && fromRow == toRow) {
             return true;
         }
-        if (piece.canLeapVertically() && fromRow == toRow) {
+        if (piece.canLeapVertically() && fromCol == toCol) {
             return true;
         }
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
