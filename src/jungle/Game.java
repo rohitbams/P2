@@ -160,13 +160,12 @@ public class Game {
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
                 throw new IllegalMoveException("Cannot capture that piece");
         }
-        if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
             // Add movingPiece new square coordinates
             piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
             // Remove movingPiece old square coordinates
             piecesHashMap.remove(createCoordinate(fromRow, fromCol));
             movingPiece.move(toSquare);
-        }
+
     }
 
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
