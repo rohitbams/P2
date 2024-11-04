@@ -171,8 +171,11 @@ public class Game {
             // Add movingPiece new square coordinates
             piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
             // Remove movingPiece old square coordinates
-            piecesHashMap.remove(createCoordinate(fromRow, fromCol), targetPiece);
+            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
             movingPiece.move(toSquare);
+        }
+        if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
+            throw new IllegalMoveException("Cannot capture that piece");
         }
     }
 
