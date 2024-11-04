@@ -5,8 +5,8 @@ import jungle.squares.Square;
 
 public class Piece {
 
-    private final Player owner;
-    private final Square square;
+    private Player owner;
+    private Square square;
     private int rank;
 
     public Piece(Player owner, Square square, int rank) {
@@ -34,9 +34,7 @@ public class Piece {
     }
 
     public boolean canLeapHorizontally() {
-        if (rank == 6) {
-            return true;
-        } return false;
+        return rank == 6;
     }
 
     public boolean canLeapVertically() {
@@ -48,9 +46,9 @@ public class Piece {
     public void move(Square toSquare) {
         if (toSquare.isDen() && !toSquare.isOwnedBy(owner)) {
             owner.captureDen();
-        } else if (toSquare.isTrap()) {
+        } else if (toSquare.isTrap() && !toSquare.isOwnedBy(owner)) {
             getStrength();
-        }
+        } // (toSquare.isWater()) {}
     }
 
     public boolean canDefeat(Piece target) {
@@ -64,6 +62,6 @@ public class Piece {
     }
 
     public void beCaptured() {
-        owner.loseOnePiece();
+        owner.hasPieces();
     }
 }

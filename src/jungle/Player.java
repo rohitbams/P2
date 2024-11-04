@@ -32,6 +32,10 @@ public class Player {
         return hasCapturedDen;
     }
 
+    public int getPieceCount() {
+        return pieceCount;
+    }
+
     public boolean hasPieces() {
         if (pieceCount > 0) return true;
         else return false;
