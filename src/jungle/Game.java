@@ -180,10 +180,36 @@ public class Game {
         Square toSquare = getSquare(toRow, toCol);
 
         if (piece.canLeapHorizontally() && fromRow == toRow) {
-            return true;
+
+            int minCol = Math.min(fromCol, toCol);
+            int maxCol = Math.max(fromCol, toCol);
+
+            for (int col = minCol + 1; col <= maxCol; col++) {
+                Square square = getSquare(fromRow, col);
+                if (!square.isWater()) {
+                    return false;
+                }
+                Piece ratInWater = getPiece(fromRow, col);
+                if (ratInWater != null && ratInWater.canSwim()) {
+                    return false;
+                }
+            } return true;
         }
         if (piece.canLeapVertically() && fromCol == toCol) {
-            return true;
+
+            int minRow = Math.min(fromRow, toRow);
+            int maxRow = Math.max(fromRow, toRow);
+
+            for (int row = minRow + 1; row <= maxRow; row++) {
+                Square square = getSquare(row, fromCol);
+                if (!square.isWater()) {
+                    return false;
+                }
+                Piece ratInWater = getPiece(fromRow, row);
+                if (ratInWater != null && ratInWater.canSwim()) {
+                    return false;
+                }
+            } return true;
         }
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
