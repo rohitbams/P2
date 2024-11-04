@@ -1,5 +1,11 @@
 package jungle;
 
+/**
+ * Player class.
+ * This class creates Player objects
+ * and contains attributes and behaviours
+ * for Player objects.
+ */
 public class Player {
 
     private final String name;

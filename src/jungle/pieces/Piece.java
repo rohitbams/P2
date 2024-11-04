@@ -3,12 +3,18 @@ import jungle.Player;
 import jungle.squares.Trap;
 import jungle.squares.Square;
 
+/** Piece class.
+ *  This class contains attributes and behaviours
+ *  of the various types of pieces in the game.
+ *  The classes Rat, Tiger, and Lion extend this class.
+ */
 public class Piece {
 
     private Player owner;
     private Square square;
     private int rank;
 
+    // Piece Constructor
     public Piece(Player owner, Square square, int rank) {
         this.owner = owner;
         this.square = square;

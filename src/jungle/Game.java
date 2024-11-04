@@ -8,7 +8,6 @@ import jungle.squares.PlainSquare;
 import jungle.squares.Square;
 import jungle.squares.WaterSquare;
 import jungle.squares.Trap;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,9 @@ import java.util.List;
  * Each player owns 8 pieces differing by strength.
  * A piece can defeat any piece with equal or less strength.
  * Some piece have special abilities.
+ * Pieces must move one square at a time.
+ * They can only move up, down, left or right.
+ * They cannot move diagonally.
  *  1. Elephant strength: 8
  *  2. Lion strength: 7; can vertically jump over water squares
  *  3. Tiger strength: 6; can horizontally jump over waters squares
@@ -57,7 +59,10 @@ public class Game {
     private Player p0;
     private Player p1;
 
-    // constructor
+    /**
+     * Game constructor creates two Player objects
+     * creates and initialises the board[][]
+     */
     public Game(Player p0, Player p1) {
         this.p0 = p0;
         this.p1 = p1;
@@ -67,19 +72,23 @@ public class Game {
     }
 
     public void initialiseBoard() {
+        // Fill in Plain squares
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
                 board[row][col] = new PlainSquare();
             }
         }
+        // Fill in Water squares
         for (int row : WATER_ROWS) {
             for (int col : WATER_COLS) {
                 board[row][col] = new WaterSquare();
             }
         }
+        // Fill in Den squares of both players
         board[0][DEN_COL] = new Den(p0);
         board[HEIGHT - 1][DEN_COL] = new Den(p1);
 
+        // Fill in Trap squares of both players
         board[0][DEN_COL - 1] = new Trap(p0);
         board[0][DEN_COL + 1] = new Trap(p0);
         board[1][DEN_COL] = new Trap(p0);
@@ -90,11 +99,12 @@ public class Game {
 
     }
 
-    // helper method for creating coordinates
+    // Helper method for creating coordinates
     private Coordinate createCoordinate(int row, int col) {
         return new Coordinate(row, col);
     }
 
+    // Add all starting pieces
     public void addStartingPieces() {
         // add P0 starting pieces
         addPiece(0, 0, 7, 0); // P0 Lion
@@ -117,6 +127,7 @@ public class Game {
         addPiece(6, 0, 8, 1); // P1 Elephant
     }
 
+    // Create pieces of various strengths and abilities
     public void addPiece(int row, int col, int rank, int playerNumber) {
         Player owner = getPlayer(playerNumber); // stores Player
         Square square = getSquare(row, col); // stores square
@@ -130,6 +141,7 @@ public class Game {
         } else {
             piece = new Piece(owner, square, rank);
         }
+        // Place pieces in a HashMap
         piecesHashMap.put(createCoordinate(row, col), piece);
     }
 
@@ -140,45 +152,73 @@ public class Game {
         return piecesHashMap.get(createCoordinate(row, col));
     }
 
+    /** the move method checks for legal moves
+     * and updates the piece position on the board.
+     * It takes 4 parameters
+     * @param fromRow
+     * @param fromCol
+     * @param toRow
+     * @param toCol
+     */
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
+        // Validate if parameters are out of bounds
         if (fromRow < 0 || fromRow >= HEIGHT || toRow < 0 || toRow >= HEIGHT
                 || fromCol < 0 || fromCol >= WIDTH || toCol < 0 || toCol >= WIDTH) {
             throw new IndexOutOfBoundsException("Invalid move");
         }
+
         Piece movingPiece = getPiece(fromRow, fromCol);
+
+        // Validate is moving piece doesn't exist
         if (movingPiece == null) {
             throw new NullPointerException();
         }
+
         Square toSquare = getSquare(toRow, toCol);
         Piece targetPiece = getPiece(toRow, toCol);
 
+        // Validate move
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
+        // Validate if moving piece can defeat target piece
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
                 throw new IllegalMoveException("Cannot capture that piece");
         }
+        // Validate if target piece can be captured
         if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
             targetPiece.beCaptured();
         }
-            // Add movingPiece new square coordinates
-            piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
-            // Remove movingPiece old square coordinates
-            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
-            movingPiece.move(toSquare);
+        // Move piece
+        movingPiece.move(toSquare);
+        // Add movingPiece new square coordinates
+        piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
+        // Remove movingPiece old square coordinates
+        piecesHashMap.remove(createCoordinate(fromRow, fromCol));
 
     }
 
+    /**
+     * isValidMove() checks for valid moves on the board.
+     * For any piece to make a valid move, it must move
+     * only one square either to the left, right, up, or down.
+     * It takes 4 parameters
+     * @param fromRow
+     * @param toRow
+     * @param fromCol
+     * @param toCol
+     * @return boolean
+     */
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
         Piece piece = getPiece(fromRow, fromCol);
-
         if (piece == null) {
             return false;
         }
-
+        // Boolean variable to check if movement is valid
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
         Square toSquare = getSquare(toRow, toCol);
 
+        // Check if piece can horizontally jump over water squares
         if (piece.canLeapHorizontally() && fromRow == toRow) {
 
             int minCol = Math.min(fromCol, toCol);
@@ -189,12 +229,15 @@ public class Game {
                 if (!square.isWater()) {
                     return false;
                 }
+                // Piece cannot jump if Rat is in water square
                 Piece ratInWater = getPiece(fromRow, col);
                 if (ratInWater != null && ratInWater.canSwim()) {
                     return false;
                 }
             } return true;
         }
+
+        // Check if piece can vertically jump over water squares
         if (piece.canLeapVertically() && fromCol == toCol) {
 
             int minRow = Math.min(fromRow, toRow);
@@ -206,6 +249,7 @@ public class Game {
                     return false;
                 }
                 Piece ratInWater = getPiece(row, fromCol);
+                // Piece cannot jump if Rat is in water square
                 if (ratInWater != null && ratInWater.canSwim()) {
                     return false;
                 }
@@ -214,7 +258,7 @@ public class Game {
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
         }
-        // if any piece other than Rat tries to enter water
+        // Check if any piece other than Rat tries to enter water
         if (toSquare.isWater() && !piece.canSwim()) {
             return false;
         }
@@ -252,70 +296,10 @@ public class Game {
 
         for (int newRow = 0; newRow < HEIGHT; newRow++) {
             for (int newCol = 0; newCol < WIDTH; newCol++) {
-                if (isValidMove(row, newRow, col,newCol)) {
+                if (isValidMove(row, newRow, col, newCol)) {
                     legalMoves.add(new Coordinate(newRow, newCol));
                 }
             }
         } return legalMoves;
         }
-
-    public HashMap<Coordinate, Piece> getPiecesHashMap() {
-        return piecesHashMap;
-    }
-
-    public void setPiecesHashMap(HashMap<Coordinate, Piece> piecesHashMap) {
-        this.piecesHashMap = piecesHashMap;
-    }
-
-//    public static void main(String[] args) {
-//        Player p0 = new Player("Player 1", 0);
-//        Player p1 = new Player("Player 2", 1);
-//
-//        Game game = new Game(p0, p1);
-//
-//
-//        System.out.println("Adding piece");
-//        game.addPiece(0, 0, 7, 0); // P0 Lion
-//        game.addPiece(0, 6, 6, 0); // P0 Tiger
-//        game.addPiece(1, 1, 3, 0); // P0 Dog
-//        game.addPiece(1, 5, 2, 0); // P0 Cat
-//        game.addPiece(2, 0, 1, 0); // P0 Rat
-//        game.addPiece(2, 2, 5, 0); // P0 Leopard
-//        game.addPiece(2, 4, 4, 0); // P0 Wolf
-//        game.addPiece(2, 6, 8, 0); // P0 Elephant
-//
-//        // add P1 starting pieces
-//        game.addPiece(8, 6, 7, 1); // P1 Lion
-//        game.addPiece(8, 0, 6, 1); // P1 Tiger
-//        game.addPiece(7, 5, 3, 1); // P1 Dog
-//        game.addPiece(7, 1, 2, 1); // P1 Cat
-//        game.addPiece(6, 6, 1, 1); // P1 Rat
-//        game.addPiece(6, 4, 5, 1); // P1 Leopard
-//        game.addPiece(6, 2, 4, 1); // P1 Wolf
-//        game.addPiece(6, 0, 8, 1); // P1 Elephant
-//
-//        System.out.println("HashMap Size: " + game.getPiecesHashMap().size());
-//
-//        //for (Coordinate coord: game.getPiecesHashMap().keySet()) {
-//            //System.out.println("row: " + coord.row() + " col: " + coord.col());
-//        //}
-//        Piece piece = game.getPiece(2, 4);
-//        // game.move(2, 4, 2, 5);
-//        System.out.println(piece);
-//
-//            System.out.println("\n" + piece != null ? "found" : "Null piece");
-//
-//        // assert piece != null;
-//        // System.out.println(piece + "strength: " + piece.getStrength());
-//
-//        System.out.println("\n All pieces in HashMap");
-//        for (Map.Entry<Coordinate, Piece> entry : game.getPiecesHashMap().entrySet()) {
-//            System.out.println(entry.getKey() + ": " + entry.getValue());
-//        }
-//
-//
-//    }
-
 }
-
-
