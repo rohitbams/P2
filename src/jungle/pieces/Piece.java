@@ -13,6 +13,7 @@ public class Piece {
         this.owner = owner;
         this.square = square;
         this.rank = rank;
+        owner.gainOnePiece();
     }
 
     public boolean isOwnedBy(Player player) {
@@ -48,7 +49,7 @@ public class Piece {
             owner.captureDen();
         } else if (toSquare.isTrap() && !toSquare.isOwnedBy(owner)) {
             getStrength();
-        } // (toSquare.isWater()) {}
+        }
     }
 
     public boolean canDefeat(Piece target) {
@@ -57,11 +58,12 @@ public class Piece {
         } else if (target.rank <= rank) {
             return true; // strength >= defeat lower
         } else if (target.square.isTrap()) {
-            return true; // pieces of lower strength can defeat trapped pieces of higher strength
+            // lower strength pieces can defeat trapped higher strength pieces
+            return true;
         } return false;
     }
 
     public void beCaptured() {
-        owner.hasPieces();
+        owner.loseOnePiece();
     }
 }
