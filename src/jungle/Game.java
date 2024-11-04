@@ -56,9 +56,6 @@ public class Game {
     private HashMap<Coordinate, Piece> piecesHashMap;
     private Player p0;
     private Player p1;
-    private Player owner;
-    private Square square;
-    private Piece piece;
 
     // constructor
     public Game(Player p0, Player p1) {
@@ -161,6 +158,9 @@ public class Game {
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
                 throw new IllegalMoveException("Cannot capture that piece");
         }
+        if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
+            targetPiece.beCaptured();
+        }
             // Add movingPiece new square coordinates
             piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
             // Remove movingPiece old square coordinates
@@ -170,7 +170,7 @@ public class Game {
     }
 
     private boolean isValidMove(int fromRow, int toRow, int fromCol, int toCol) {
-        piece = getPiece(fromRow, fromCol);
+        Piece piece = getPiece(fromRow, fromCol);
 
         if (piece == null) {
             return false;
@@ -180,10 +180,10 @@ public class Game {
         Square toSquare = getSquare(toRow, toCol);
 
         if (piece.canLeapHorizontally() && fromRow == toRow) {
-            return false;
+            return true;
         }
         if (piece.canLeapVertically() && fromRow == toRow) {
-            return false;
+            return true;
         }
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
