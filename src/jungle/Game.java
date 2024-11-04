@@ -143,8 +143,8 @@ public class Game {
     }
 
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
-        if (fromRow < 0 || fromRow >= WIDTH || toRow < 0 || toRow >= WIDTH
-                || fromCol < 0 || fromCol >= HEIGHT || toCol < 0 || toCol >= HEIGHT) {
+        if (fromRow < 0 || fromRow >= HEIGHT || toRow < 0 || toRow >= HEIGHT
+                || fromCol < 0 || fromCol >= WIDTH || toCol < 0 || toCol >= WIDTH) {
             throw new IndexOutOfBoundsException("Invalid move");
         }
         Piece movingPiece = getPiece(fromRow, fromCol);
@@ -161,9 +161,17 @@ public class Game {
             if (!movingPiece.canDefeat(null)) {
                 throw new IllegalMoveException("Cannot capture that piece");
             }
-            // 
+            // Add movingPiece new square coordinates
             piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
-            piecesHashMap.remove(createCoordinate(fromRow, fromCol), movingPiece);
+            // Remove movingPiece old square coordinates
+            piecesHashMap.remove(createCoordinate(fromRow, fromCol));
+            movingPiece.move(toSquare);
+        }
+        if (movingPiece.canDefeat(targetPiece)) {
+            // Add movingPiece new square coordinates
+            piecesHashMap.put(createCoordinate(toRow, toCol), movingPiece);
+            // Remove movingPiece old square coordinates
+            piecesHashMap.remove(createCoordinate(fromRow, fromCol), targetPiece);
             movingPiece.move(toSquare);
         }
     }
