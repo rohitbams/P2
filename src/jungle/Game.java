@@ -330,6 +330,7 @@ public class Game {
         if (row < 0 || row >= HEIGHT
                 || col < 0 || col >= WIDTH) {
             throw new IndexOutOfBoundsException("Check your square coordinates");
+        }
             Piece piece = getPiece(row, col);
 
             int[] rowDeltas = {-1, 1, 0, 0}; // legal moves per row
