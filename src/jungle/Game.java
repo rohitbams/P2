@@ -1,4 +1,5 @@
 package jungle;
+
 import jungle.pieces.Lion;
 import jungle.pieces.Piece;
 import jungle.pieces.Rat;
@@ -8,6 +9,7 @@ import jungle.squares.PlainSquare;
 import jungle.squares.Square;
 import jungle.squares.WaterSquare;
 import jungle.squares.Trap;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +20,12 @@ import java.util.List;
  * Each player has 8 pieces of varying strengths.
  * The Board:
  * The board is made up 63 squares. There are 4 types of squares
- *  1. 43 Plain squares
- *  2. 12 Water squares that only certain pieces can traverse
- *  3. 2 Den Squares owned by one player each
- *     If a square lands on this piece, the game ends.
- *  4. 6 Trap squares owned by one player 3 each.
- *     These squares affect the strength of pieces.
+ * 1. 43 Plain squares
+ * 2. 12 Water squares that only certain pieces can traverse
+ * 3. 2 Den Squares owned by one player each
+ * If a square lands on this piece, the game ends.
+ * 4. 6 Trap squares owned by one player 3 each.
+ * These squares affect the strength of pieces.
  * The Pieces:
  * Each player owns 8 pieces differing by strength.
  * A piece can defeat any piece with equal or less strength.
@@ -31,14 +33,14 @@ import java.util.List;
  * Pieces must move one square at a time.
  * They can only move up, down, left or right.
  * They cannot move diagonally.
- *  1. Elephant strength: 8
- *  2. Lion strength: 7; can vertically jump over water squares
- *  3. Tiger strength: 6; can horizontally jump over waters squares
- *  4. Leopard strength: 5;
- *  5. Wolf strength: 4;
- *  6. Dog strength: 3;
- *  7. Cat strength: 2;
- *  8. Rat strength: 1; can swim in water squares & can defeat Elephant
+ * 1. Elephant strength: 8
+ * 2. Lion strength: 7; can vertically or horizontally jump over water squares
+ * 3. Tiger strength: 6; can horizontally jump over waters squares
+ * 4. Leopard strength: 5;
+ * 5. Wolf strength: 4;
+ * 6. Dog strength: 3;
+ * 7. Cat strength: 2;
+ * 8. Rat strength: 1; can swim in water squares & can defeat Elephant
  * The Objective:
  * The objective of the game is to win by one of two ways:
  * 1. Enter opponents Den square
@@ -152,9 +154,11 @@ public class Game {
         return piecesHashMap.get(createCoordinate(row, col));
     }
 
-    /** the move method checks for legal moves
+    /**
+     * the move method checks for legal moves
      * and updates the piece position on the board.
      * It takes 4 parameters
+     *
      * @param fromRow
      * @param fromCol
      * @param toRow
@@ -162,16 +166,21 @@ public class Game {
      */
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
         // Validate if parameters are out of bounds
-        if (fromRow < 0 || fromRow >= HEIGHT  || fromCol < 0 || fromCol >= WIDTH ) {
-            throw new IndexOutOfBoundsException("No such square");
+        try {
+            if (fromRow < 0 || fromRow >= HEIGHT
+                    || fromCol < 0 || fromCol >= WIDTH) {
+                throw new IndexOutOfBoundsException("Check your square coordinates");
+            }
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalMoveException("Invalid move");
         }
 
         try {
-            if (fromRow < 0 || fromRow >= HEIGHT || toRow < 0 || toRow >= HEIGHT
-                    || fromCol < 0 || fromCol >= WIDTH || toCol < 0 || toCol >= WIDTH) {
-                throw new IndexOutOfBoundsException("Invalid move");
+            if (toRow < 0 || toRow >= HEIGHT
+                    || toCol < 0 || toCol >= WIDTH) {
+                throw new IndexOutOfBoundsException("Check your square coordinates");
             }
-        } catch (IndexOutOfBoundsException e ) {
+        } catch (IndexOutOfBoundsException e) {
             throw new IllegalMoveException("Invalid move");
         }
 
@@ -199,7 +208,7 @@ public class Game {
         }
         // Validate if moving piece can defeat target piece
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
-                throw new IllegalMoveException("Cannot capture that piece");
+            throw new IllegalMoveException("Cannot capture that piece");
         }
         // Validate if target piece can be captured
         if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
@@ -219,6 +228,7 @@ public class Game {
      * For any piece to make a valid move, it must move
      * only one square either to the left, right, up, or down.
      * It takes 4 parameters from the move() method.
+     *
      * @param fromRow
      * @param toRow
      * @param fromCol
@@ -250,7 +260,8 @@ public class Game {
                 if (ratInWater != null && ratInWater.canSwim()) {
                     return false;
                 }
-            } return true;
+            }
+            return true;
         }
 
         // Check if piece can jump vertically over water squares
@@ -268,7 +279,8 @@ public class Game {
                 if (ratInWater != null && ratInWater.canSwim()) {
                     return false;
                 }
-            } return true;
+            }
+            return true;
         }
         if (!isAdjacent && !piece.canLeapHorizontally() && !piece.canLeapVertically()) {
             return false;
@@ -293,7 +305,8 @@ public class Game {
             return p0;
         } else if (p1.hasCapturedDen() || !p0.hasPieces()) {
             return p1;
-        } return null;
+        }
+        return null;
     }
 
     public boolean isGameOver() {
@@ -303,7 +316,8 @@ public class Game {
     public Square getSquare(int row, int col) {
         if (row < 0 || row >= HEIGHT || col < 0 || col >= WIDTH) {
             throw new IndexOutOfBoundsException();
-        } return board[row][col];
+        }
+        return board[row][col];
     }
 
     public List<Coordinate> getLegalMoves(int row, int col) {
@@ -319,26 +333,40 @@ public class Game {
             if (isValidMove(row, newRow, col, newCol)) {
                 legalMoves.add(new Coordinate(newRow, newCol));
             }
-            if (piece != null && piece.canLeapHorizontally()) {
-                if (col == 0) {
-                    if (isValidMove(row, row, col, 3)) { // col 0 to 3
-                        legalMoves.add(new Coordinate(row, 3));
-                    }
-                } else if (col == 0) {
-                    if (isValidMove(row, row, col, 0)) {
-                        legalMoves.add(new Coordinate(row, 0));
-                    }
-                    if (isValidMove(row, row, col, 6)) {
-                        legalMoves.add(new Coordinate(row, 6));
-                    }
-                } else if (col == 6) {
-                    if (isValidMove(row, row, col, 3)) {
-                        legalMoves.add(new Coordinate(row, 3));
-                    }
+        }
+        if (piece != null && piece.canLeapHorizontally()) {
+            if (col == 0) {
+                if (isValidMove(row, row, col, 3)) { // col 0 to 3
+                    legalMoves.add(new Coordinate(row, 3));
                 }
+            } else if (col == 3) {
+                if (isValidMove(row, row, col, 0)) {
+                    legalMoves.add(new Coordinate(row, 0));
+                }
+                if (isValidMove(row, row, col, 6)) {
+                    legalMoves.add(new Coordinate(row, 6));
+                }
+            } else if (col == 6) {
+                if (isValidMove(row, row, col, 3)) {
+                    legalMoves.add(new Coordinate(row, 3));
+                }
+            }
 
+        }
+        if (piece != null && piece.canLeapVertically() && piece.canLeapHorizontally()) {
+            if (row == 0) {
+                if (isValidMove(row, row, col, 3)) {
+                    legalMoves.add(new Coordinate(row, 3));
+                }
+                if (isValidMove(row, row, col, 4)) {
+                    legalMoves.add(new Coordinate(row, 4));
+                }
+                if (isValidMove(row, row, col, 5)) {
+                    legalMoves.add(new Coordinate(row, 5));
+                }
             }
         }
+
         return legalMoves;
     }
 }

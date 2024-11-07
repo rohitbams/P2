@@ -7,9 +7,9 @@ import jungle.squares.Square;
  * This is a subclass of the Piece class.
  * It creates the special piece Lion which
  * has a rank of 7 and has the ability to
- * vertically jump over water squares
- * given that there is not Rat piece in
- * the water.
+ * vertically or horizontally jump over water
+ * squares given that there is not Rat piece
+ * in the water.
  */
 public class Lion extends Piece {
 
