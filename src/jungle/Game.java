@@ -172,7 +172,7 @@ public class Game {
                 throw new IndexOutOfBoundsException("Check your square coordinates");
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new IllegalMoveException("Invalid move");
+            throw new IndexOutOfBoundsException("Check your square coordinates");
         }
 
         try {
@@ -244,6 +244,11 @@ public class Game {
         // by finding the absolute value of the difference between coordinate numbers.
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
         Square toSquare = getSquare(toRow, toCol);
+
+
+        if (piece.canLeapHorizontally() && !piece.canLeapVertically() && fromCol != toCol && fromRow != toRow) {
+            throw new IllegalMoveException("Invalid move");
+        }
 
         // Check if piece can jump horizontally over water squares
         if (piece.canLeapHorizontally() && fromRow == toRow) {
@@ -322,50 +327,55 @@ public class Game {
 
     public List<Coordinate> getLegalMoves(int row, int col) {
         List<Coordinate> legalMoves = new ArrayList<>();
-        Piece piece = getPiece(row, col);
+        if (row < 0 || row >= HEIGHT
+                || col < 0 || col >= WIDTH) {
+            throw new IndexOutOfBoundsException("Check your square coordinates");
+            Piece piece = getPiece(row, col);
 
-        int[] rowDeltas = {-1, 1, 0, 0}; // legal moves per row
-        int[] colDeltas = {0, 0, -1, 1}; // legal moves per column
+            int[] rowDeltas = {-1, 1, 0, 0}; // legal moves per row
+            int[] colDeltas = {0, 0, -1, 1}; // legal moves per column
 
-        for (int i = 0; i < rowDeltas.length; i++) {
-            int newRow = row + rowDeltas[i];
-            int newCol = col + colDeltas[i];
-            if (isValidMove(row, newRow, col, newCol)) {
-                legalMoves.add(new Coordinate(newRow, newCol));
+            for (int i = 0; i < rowDeltas.length; i++) {
+                int newRow = row + rowDeltas[i];
+                int newCol = col + colDeltas[i];
+
+                if (newRow >= 0 && newRow >= HEIGHT && newCol >= 0 && newCol < WIDTH) {
+                    if (isValidMove(row, newRow, col, newCol)) {
+                        legalMoves.add(new Coordinate(newRow, newCol));
+                    }
+                }
             }
+            if (piece != null && piece.canLeapHorizontally()) {
+                if (col == 0) {
+                    if (isValidMove(row, row, col, 3)) { // col 0 to 3
+                        legalMoves.add(new Coordinate(row, 3));
+                    }
+                } else if (col == 3) {
+                    if (isValidMove(row, row, col, 0)) {
+                        legalMoves.add(new Coordinate(row, 0));
+                    }
+                    if (isValidMove(row, row, col, 6)) {
+                        legalMoves.add(new Coordinate(row, 6));
+                    }
+                } else if (col == 6) {
+                    if (isValidMove(row, row, col, 3)) {
+                        legalMoves.add(new Coordinate(row, 3));
+                    }
+                }
+
+            }
+            if (piece != null && piece.canLeapVertically()) {
+                if (row == 2) {
+                    if (isValidMove(row, 6, col, col)) {
+                        legalMoves.add(new Coordinate(6, col));
+                    }
+                } else if (row == 6) {
+                    if (isValidMove(row, 2, col, col)) {
+                        legalMoves.add(new Coordinate(2, col));
+                    }
+                }
+            }
+
+            return legalMoves;
         }
-        if (piece != null && piece.canLeapHorizontally()) {
-            if (col == 0) {
-                if (isValidMove(row, row, col, 3)) { // col 0 to 3
-                    legalMoves.add(new Coordinate(row, 3));
-                }
-            } else if (col == 3) {
-                if (isValidMove(row, row, col, 0)) {
-                    legalMoves.add(new Coordinate(row, 0));
-                }
-                if (isValidMove(row, row, col, 6)) {
-                    legalMoves.add(new Coordinate(row, 6));
-                }
-            } else if (col == 6) {
-                if (isValidMove(row, row, col, 3)) {
-                    legalMoves.add(new Coordinate(row, 3));
-                }
-            }
-
-        }
-        if (piece != null && piece.canLeapVertically()) {
-            if (row == 2) {
-                if (isValidMove(row, 6, col, col)) {
-                    legalMoves.add(new Coordinate(row, 3));
-                }
-            }
-            else if (row == 6) {
-                if (isValidMove(row, 2, col, 4)) {
-                    legalMoves.add(new Coordinate(row, 4));
-                }
-            }
-        }
-
-        return legalMoves;
     }
-}
