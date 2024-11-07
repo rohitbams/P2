@@ -308,7 +308,7 @@ public class Game {
 
     public List<Coordinate> getLegalMoves(int row, int col) {
         List<Coordinate> legalMoves = new ArrayList<>();
-
+        Piece piece = getPiece(row, col);
 
         int[] rowDeltas = {-1, 1, 0, 0}; // legal moves per row
         int[] colDeltas = {0, 0, -1, 1}; // legal moves per column
@@ -319,6 +319,26 @@ public class Game {
             if (isValidMove(row, newRow, col, newCol)) {
                 legalMoves.add(new Coordinate(newRow, newCol));
             }
-        } return legalMoves;
+            if (piece != null && piece.canLeapHorizontally()) {
+                if (col == 0) {
+                    if (isValidMove(row, row, col, 3)) { // col 0 to 3
+                        legalMoves.add(new Coordinate(row, 3));
+                    }
+                } else if (col == 0) {
+                    if (isValidMove(row, row, col, 0)) {
+                        legalMoves.add(new Coordinate(row, 0));
+                    }
+                    if (isValidMove(row, row, col, 6)) {
+                        legalMoves.add(new Coordinate(row, 6));
+                    }
+                } else if (col == 6) {
+                    if (isValidMove(row, row, col, 3)) {
+                        legalMoves.add(new Coordinate(row, 3));
+                    }
+                }
+
+            }
         }
+        return legalMoves;
+    }
 }
