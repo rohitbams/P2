@@ -25,6 +25,13 @@ public class Coordinate {
         return col;
     }
 
+    /**
+     * This method overrides the equals() method
+     * in the String class to check hash key equality
+     * for row and col coordinates.
+     *
+     * @param obj
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -37,9 +44,12 @@ public class Coordinate {
         return row == other.row && col == other.col;
     }
 
+    /**
+     * Override hashCode().
+     * @return
+     */
     @Override
     public int hashCode() {
-        // Simple but effective hash code implementation
         return row * 31 + col;
     }
 }

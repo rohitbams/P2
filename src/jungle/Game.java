@@ -11,7 +11,6 @@ import jungle.squares.Trap;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Welcome to the board game Jungle.
@@ -71,22 +70,7 @@ public class Game {
         this.piecesHashMap = new HashMap<>();
         initialiseBoard();
     }
-    // Add this method to your Game class
-    private void debugPrintMap() {
-        System.out.println("\nDEBUG: HashMap contents:");
-        for (Map.Entry<Coordinate, Piece> entry : piecesHashMap.entrySet()) {
-            Coordinate coord = entry.getKey();
-            Piece piece = entry.getValue();
-            System.out.println(String.format("Position (%d,%d) -> Piece strength: %d",
-                    coord.row(), coord.col(), piece.getStrength()));
-        }
-    }
-    /**Initialise the board.
-     * This method initialises the board
-     * in a 2D array for rows and columns
-     * and fills it with square objects.
-     *
-     */
+
     public void initialiseBoard() {
         // Fill in Plain squares
         for (int row = 0; row < HEIGHT; row++) {
@@ -148,9 +132,6 @@ public class Game {
         Player owner = getPlayer(playerNumber); // stores Player
         Square square = getSquare(row, col); // stores square
         Piece piece;
-
-        System.out.println("DEBUG: Creating piece with rank " + rank + " at position (" + row + "," + col + ")");
-
         if (rank == 7) {
             piece = new Lion(owner, square);
         } else if (rank == 6) {
@@ -161,14 +142,7 @@ public class Game {
             piece = new Piece(owner, square, rank);
         }
         // Place pieces in a HashMap
-        // piecesHashMap.put(createCoordinate(row, col), piece);
-
-        Coordinate coord = createCoordinate(row, col);
-        System.out.println("DEBUG: Created coordinate: (" + coord.row() + "," + coord.col() + ")");
-
-        piecesHashMap.put(coord, piece);
-        System.out.println("DEBUG: Added piece to map. Current map size: " + piecesHashMap.size());
-        debugPrintMap();
+        piecesHashMap.put(createCoordinate(row, col), piece);
     }
 
     public Piece getPiece(int row, int col) {
@@ -178,12 +152,8 @@ public class Game {
         return piecesHashMap.get(createCoordinate(row, col));
     }
 
-    /** the move method.
-     * This handles piece movement by taking in starting
-     * and ending positions for a piece and checks if
-     * the move is legal, whether it captures an
-     * opponent piece, and then updates the piece's
-     * position in the pieceHashMap.
+    /** the move method checks for legal moves
+     * and updates the piece position on the board.
      * It takes 4 parameters
      * @param fromRow
      * @param fromCol
@@ -191,29 +161,45 @@ public class Game {
      * @param toCol
      */
     public void move(int fromRow, int fromCol, int toRow, int toCol) {
-        // Validate if coordinates are out of bounds
-        if (fromRow < 0 || fromRow >= HEIGHT || toRow < 0 || toRow >= HEIGHT
-                || fromCol < 0 || fromCol >= WIDTH || toCol < 0 || toCol >= WIDTH) {
-            throw new IndexOutOfBoundsException("Invalid move");
+        // Validate if parameters are out of bounds
+        if (fromRow < 0 || fromRow >= HEIGHT  || fromCol < 0 || fromCol >= WIDTH ) {
+            throw new IndexOutOfBoundsException("No such square");
         }
-        // get piece on starting coordinates
+
+        try {
+            if (fromRow < 0 || fromRow >= HEIGHT || toRow < 0 || toRow >= HEIGHT
+                    || fromCol < 0 || fromCol >= WIDTH || toCol < 0 || toCol >= WIDTH) {
+                throw new IndexOutOfBoundsException("Invalid move");
+            }
+        } catch (IndexOutOfBoundsException e ) {
+            throw new IllegalMoveException("Invalid move");
+        }
+
+        if (getPiece(fromRow, fromCol) != null) {
+            Piece currentPiece = getPiece(fromRow, fromCol);
+            if (currentPiece.isOwnedBy(p1)) {
+                throw new IllegalMoveException("Cannot move owned by piece");
+            }
+        }
+
+
         Piece movingPiece = getPiece(fromRow, fromCol);
-        // Check is moving piece doesn't exist
+
+        // Validate if moving piece doesn't exist
         if (movingPiece == null) {
             throw new NullPointerException();
         }
-        // get end square
+
         Square toSquare = getSquare(toRow, toCol);
-        // get piece if it exists on end square
         Piece targetPiece = getPiece(toRow, toCol);
 
-        // Validate move
+        // Validate move using isValidMove() method
         if (!isValidMove(fromRow, toRow, fromCol, toCol)) {
             throw new IllegalMoveException("Invalid move");
         }
         // Validate if moving piece can defeat target piece
         if (targetPiece != null && !movingPiece.canDefeat(targetPiece)) {
-            throw new IllegalMoveException("Cannot capture that piece");
+                throw new IllegalMoveException("Cannot capture that piece");
         }
         // Validate if target piece can be captured
         if (targetPiece != null && movingPiece.canDefeat(targetPiece)) {
@@ -232,7 +218,7 @@ public class Game {
      * isValidMove() checks for valid moves on the board.
      * For any piece to make a valid move, it must move
      * only one square either to the left, right, up, or down.
-     * It takes 4 parameters
+     * It takes 4 parameters from the move() method.
      * @param fromRow
      * @param toRow
      * @param fromCol
@@ -244,13 +230,13 @@ public class Game {
         if (piece == null) {
             return false;
         }
-        // Boolean variable to check if movement is valid
+        // Boolean variable to check if new move coordinates are less than 1 square away
+        // by finding the absolute value of the difference between coordinate numbers.
         boolean isAdjacent = Math.abs(fromRow - toRow) + Math.abs(fromCol - toCol) == 1;
         Square toSquare = getSquare(toRow, toCol);
 
-        // Check if piece can horizontally jump over water squares
+        // Check if piece can jump horizontally over water squares
         if (piece.canLeapHorizontally() && fromRow == toRow) {
-
             int minCol = Math.min(fromCol, toCol);
             int maxCol = Math.max(fromCol, toCol);
 
@@ -267,9 +253,8 @@ public class Game {
             } return true;
         }
 
-        // Check if piece can vertically jump over water squares
+        // Check if piece can jump vertically over water squares
         if (piece.canLeapVertically() && fromCol == toCol) {
-
             int minRow = Math.min(fromRow, toRow);
             int maxRow = Math.max(fromRow, toRow);
 
@@ -324,163 +309,16 @@ public class Game {
     public List<Coordinate> getLegalMoves(int row, int col) {
         List<Coordinate> legalMoves = new ArrayList<>();
 
-        for (int newRow = 0; newRow < HEIGHT; newRow++) {
-            for (int newCol = 0; newCol < WIDTH; newCol++) {
-                if (isValidMove(row, newRow, col, newCol)) {
-                    legalMoves.add(new Coordinate(newRow, newCol));
-                }
+
+        int[] rowDeltas = {-1, 1, 0, 0}; // legal moves per row
+        int[] colDeltas = {0, 0, -1, 1}; // legal moves per column
+
+        for (int i = 0; i < rowDeltas.length; i++) {
+            int newRow = row + rowDeltas[i];
+            int newCol = col + colDeltas[i];
+            if (isValidMove(row, newRow, col, newCol)) {
+                legalMoves.add(new Coordinate(newRow, newCol));
             }
         } return legalMoves;
-    }
-
-    public static void main(String[] args) {
-        // Create players
-        Player player0 = new Player("Player 0", 0);
-        Player player1 = new Player("Player 1", 1);
-        Game game = new Game(player0, player1);
-
-        // Test Case 1: Detailed Wolf placement and movement
-        System.out.println("\nTest Case 1: Detailed Wolf Test");
-        System.out.println("Attempting to place wolf at (2,4)...");
-
-        // Place wolf and verify square contents before and after
-        System.out.println("Square at (2,4) before placement: " + game.getPiece(2, 4));
-        game.addPiece(2, 4, 4, 0); // Adding wolf (rank 4) for player 0
-        System.out.println("Square at (2,4) after placement: " + game.getPiece(2, 4));
-
-        // Check the actual square type
-        System.out.println("Square type at (2,4): " + game.getSquare(2, 4).getClass().getSimpleName());
-
-        // Try to verify player piece count
-        System.out.println("Player 0 piece count: " + player0.getPieceCount());
-
-        Piece wolf = game.getPiece(2, 4);
-        if (wolf != null) {
-            System.out.println("Wolf details:");
-            System.out.println("- Strength: " + wolf.getStrength());
-            System.out.println("- Owned by player 0: " + wolf.isOwnedBy(player0));
-
-            try {
-                System.out.println("Attempting to move wolf to (2,3)...");
-                game.move(2, 4, 2, 3);
-                System.out.println("After move, piece at (2,3): " + game.getPiece(2, 3));
-                System.out.println("After move, piece at (2,4): " + game.getPiece(2,4));
-            } catch (Exception e) {
-                System.out.println("Move failed with exception: " + e);
-                System.out.println("Exception message: " + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("DEBUG: Wolf is null after placement");
         }
-
-        // Debug Map Contents
-        System.out.println("\nAttempting to place pieces at different positions to debug map storage:");
-        game = new Game(player0, player1);
-
-        // Try multiple placements
-        int[][] positions = {{1,1}, {2,2}, {3,3}};
-        for (int[] pos : positions) {
-            System.out.println("\nTrying position (" + pos[0] + "," + pos[1] + "):");
-            game.addPiece(pos[0], pos[1], 4, 0); // place wolf
-            Piece piece = game.getPiece(pos[0], pos[1]);
-            System.out.println("Piece placed: " + (piece != null));
-            if (piece != null) {
-                System.out.println("Piece strength: " + piece.getStrength());
-                System.out.println("Piece owner: " + piece.isOwnedBy(player0));
-            }
-        }
-    }
-
-
-//    public static void main(String[] args) {
-//        // Create players and game
-//        Player player0 = new Player("Player 0", 0);
-//        Player player1 = new Player("Player 1", 1);
-//        Game game = new Game(player0, player1);
-//
-//        System.out.println("=== Testing Different Piece Movements ===\n");
-//
-//        // Test 1: Basic Wolf Movement
-//        System.out.println("Test 1: Wolf Basic Movement");
-//        game.addPiece(2, 4, 4, 0); // Add wolf for player 0
-//        try {
-//            System.out.println("Moving wolf from (2,4) to (2,3)");
-//            game.move(2, 4, 2, 3);
-//            Piece wolf = game.getPiece(2, 3);
-//            System.out.println("Move successful: " + (wolf != null));
-//            System.out.println("Wolf strength: " + wolf.getStrength());
-//        } catch (Exception e) {
-//            System.out.println("Move failed: " + e.getMessage());
-//        }
-//
-//        // Reset game for next test
-//        game = new Game(player0, player1);
-//
-//        // Test 2: Rat Swimming
-//        System.out.println("\nTest 2: Rat Swimming in Water");
-//        game.addPiece(3, 0, 1, 0); // Add rat for player 0
-//        try {
-//            System.out.println("Moving rat from (3,0) to water at (3,1)");
-//            game.move(3, 0, 3, 1);
-//            Piece rat = game.getPiece(3, 1);
-//            System.out.println("Move successful: " + (rat != null));
-//            System.out.println("Rat in water: " + game.getSquare(3, 1).isWater());
-//        } catch (Exception e) {
-//            System.out.println("Move failed: " + e.getMessage());
-//        }
-//
-//        // Reset game for next test
-//        game = new Game(player0, player1);
-//
-//        // Test 3: Lion Jump
-//        System.out.println("\nTest 3: Lion Jumping Over Water");
-//        game.addPiece(2, 1, 7, 0); // Add lion for player 0
-//        game.addPiece(7, 1, 2, 1); // Add opponent's piece to make move legal
-//        try {
-//            System.out.println("Lion attempting to jump from (2,1) to (6,1)");
-//            game.move(2, 1, 6, 1);
-//            Piece lion = game.getPiece(6, 1);
-//            System.out.println("Jump successful: " + (lion != null));
-//            System.out.println("Lion strength: " + lion.getStrength());
-//        } catch (Exception e) {
-//            System.out.println("Jump failed: " + e.getMessage());
-//        }
-//
-//        // Reset game for next test
-//        game = new Game(player0, player1);
-//
-//        // Test 4: Capture
-//        System.out.println("\nTest 4: Wolf Capturing Cat");
-//        game.addPiece(2, 2, 4, 0); // Add wolf (rank 4) for player 0
-//        game.addPiece(2, 3, 2, 1); // Add cat (rank 2) for player 1
-//        try {
-//            System.out.println("Wolf attempting to capture cat");
-//            Piece beforeCat = game.getPiece(2, 3);
-//            System.out.println("Cat initial strength: " + beforeCat.getStrength());
-//            game.move(2, 2, 2, 3);
-//            Piece afterWolf = game.getPiece(2, 3);
-//            System.out.println("Capture successful: " + (afterWolf != null && afterWolf.getStrength() == 4));
-//        } catch (Exception e) {
-//            System.out.println("Capture failed: " + e.getMessage());
-//        }
-//
-//        // Reset game for next test
-//        game = new Game(player0, player1);
-//
-//        // Test 5: Tiger Horizontal Jump
-//        System.out.println("\nTest 5: Tiger Horizontal Water Jump");
-//        game.addPiece(3, 0, 6, 0); // Add tiger for player 0
-//        try {
-//            System.out.println("Tiger attempting to jump from (3,0) to (3,3)");
-//            game.move(3, 0, 3, 3);
-//            Piece tiger = game.getPiece(3, 3);
-//            System.out.println("Jump successful: " + (tiger != null));
-//            System.out.println("Tiger strength: " + tiger.getStrength());
-//        } catch (Exception e) {
-//            System.out.println("Jump failed: " + e.getMessage());
-//        }
-//    }
-
 }
-
