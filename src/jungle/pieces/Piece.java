@@ -1,6 +1,5 @@
 package jungle.pieces;
 import jungle.Player;
-import jungle.squares.Trap;
 import jungle.squares.Square;
 
 /** Piece class.

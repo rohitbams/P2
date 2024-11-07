@@ -1,4 +1,5 @@
 package jungle;
+import java.util.Objects;
 
 /**
  * Coordinate class.
@@ -7,8 +8,8 @@ package jungle;
  * as they move along the board.
  */
 public class Coordinate {
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
 
     // Constructor
     public Coordinate(int row, int col) {
@@ -17,12 +18,28 @@ public class Coordinate {
     }
 
     public int row() {
-        // if row is less than 6 && more than 0
         return row;
     }
 
     public int col() {
-        // if col is less than 8 && more than 0
         return col;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Coordinate other = (Coordinate) obj;
+        return row == other.row && col == other.col;
+    }
+
+    @Override
+    public int hashCode() {
+        // Simple but effective hash code implementation
+        return row * 31 + col;
     }
 }
