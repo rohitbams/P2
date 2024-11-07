@@ -353,16 +353,15 @@ public class Game {
             }
 
         }
-        if (piece != null && piece.canLeapVertically() && piece.canLeapHorizontally()) {
-            if (row == 0) {
-                if (isValidMove(row, row, col, 3)) {
+        if (piece != null && piece.canLeapVertically()) {
+            if (row == 2) {
+                if (isValidMove(row, 6, col, col)) {
                     legalMoves.add(new Coordinate(row, 3));
                 }
-                if (isValidMove(row, row, col, 4)) {
+            }
+            else if (row == 6) {
+                if (isValidMove(row, 2, col, 4)) {
                     legalMoves.add(new Coordinate(row, 4));
-                }
-                if (isValidMove(row, row, col, 5)) {
-                    legalMoves.add(new Coordinate(row, 5));
                 }
             }
         }
